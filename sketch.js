@@ -1,7 +1,11 @@
-let squareCount;
 const helpDurationMillis = 1000;
+const helpTimeOutMillis = 10000;
 
 let img;
+let imissingTileImage;
+let fakeHelpImage;
+
+let squareCount;
 
 let imgSquares = [];
 
@@ -10,11 +14,13 @@ let squareWidth;
 let squareHeight;
 
 let missingTileIndex;
-let helpMode;
+let helpRequestTime;
+let lastHelpRequest;
 
 
 preload = () => {
     img = loadImage('IMG_20190627_223335_SCALED.png');
+    fakeHelpImage = loadImage('WRONG_HELP.jpg');
     missingTileImage = loadImage('missing-tile.png');
 }
 
@@ -46,7 +52,7 @@ setup = () => {
     const canvas = createCanvas(img.width, img.height);
     canvas.parent('sketch-holder');
 
-    levelSlider = createSlider(3, 10, 5);
+    levelSlider = createSlider(3, 5, 5);
     levelSlider.class(['slider']);
     levelSlider.parent('level-slider');
 
@@ -54,10 +60,10 @@ setup = () => {
     missingTileImage.loadPixels();
 
     const holder = document.getElementById('sketch-holder');
-    const help = document.getElementById('help'); 
-    help.style.left = (holder.offsetLeft  + 10) + "px";
+    const help = document.getElementById('help');
+    help.style.left = (holder.offsetLeft + 10) + "px";
     help.style.top = (holder.offsetTop + 10 + height) + "px";
-    
+
     levelSetup();
 
 
@@ -71,12 +77,21 @@ switctTiles = (a, b) => {
 
 keyPressed = ({ key }) => {
     if (key && key.toLocaleLowerCase() === 'h') {
-        helpMode = new Date();
+        trueHelp = true;
+        const now = new Date();
+        if (lastHelpRequest) {
+            if (lastHelpRequest.getTime() + helpTimeOutMillis > now.getTime()) {
+                trueHelp = false;
+            }
+        }
+        helpRequestTime = now;
+        lastHelpRequest = now;
+        console.log(trueHelp);
     }
 }
 
 mouseClicked = ({ offsetX, offsetY }) => {
-    if (helpMode === undefined) {
+    if (helpRequestTime === undefined) {
 
         const tileIndexClicked = Math.floor(offsetX / squareWidth) + Math.floor(offsetY / squareHeight) * squareCount;
         if (tileIndexClicked === missingTileIndex - 1) {
@@ -97,10 +112,10 @@ mouseClicked = ({ offsetX, offsetY }) => {
 }
 
 draw = () => {
-    if (helpMode) {
-        image(img, 0, 0);
-        if (new Date().getTime() > helpMode.getTime() + helpDurationMillis) {
-            helpMode = undefined;
+    if (helpRequestTime) {
+        image(trueHelp ? img : fakeHelpImage, 0, 0);
+        if (new Date().getTime() > helpRequestTime.getTime() + helpDurationMillis) {
+            helpRequestTime = undefined;
         }
     } else {
         if (levelSlider.value() !== squareCount) {
