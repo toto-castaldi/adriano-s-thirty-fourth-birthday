@@ -38,6 +38,8 @@ levelSetup = () => {
         }
     }
 
+    imgSquares = shuffle(imgSquares);
+
     
     missingTileIndex = squareCount * squareCount - 1;
 
@@ -45,15 +47,14 @@ levelSetup = () => {
 
     pd = pixelDensity();
 
-    imgSquares = shuffle(imgSquares);
-
+    
 }
 
 setup = () => {
     const canvas = createCanvas(img.width, img.height);
     canvas.parent('sketch-holder');
 
-    levelSlider = createSlider(3, 5, 5);
+    levelSlider = createSlider(3, 5, 12);
     levelSlider.class(['slider']);
     levelSlider.parent('level-slider');
 
