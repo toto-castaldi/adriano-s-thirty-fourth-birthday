@@ -38,13 +38,14 @@ levelSetup = () => {
         }
     }
 
-    imgSquares = shuffle(imgSquares);
-
+    
     missingTileIndex = squareCount * squareCount - 1;
 
     imgSquares[missingTileIndex] = missingTileImage.get(0, 0, squareWidth, squareHeight);
 
     pd = pixelDensity();
+
+    imgSquares = shuffle(imgSquares);
 
 }
 
