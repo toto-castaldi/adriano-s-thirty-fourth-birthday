@@ -1,7 +1,5 @@
-const horizontalSquareCount = 5;
-const verticalSquareCount = 5;
+let squareCount;
 const helpDurationMillis = 1000;
-
 
 let img;
 
@@ -20,14 +18,14 @@ preload = () => {
     missingTileImage = loadImage('missing-tile.png');
 }
 
-setup = () => {
-    const canvas = createCanvas(img.width, img.height);
-    canvas.parent('sketch-holder');
+levelSetup = () => {
+    squareCount = levelSlider.value();
 
-    squareWidth = width / horizontalSquareCount;
-    squareHeight = height / verticalSquareCount;
+    imgSquares = [];
 
-    img.loadPixels();
+    squareWidth = width / squareCount;
+    squareHeight = height / squareCount;
+
     for (var y = 0; y < height; y += squareHeight) {
         for (var x = 0; x < width; x += squareWidth) {
             imgSquares.push(img.get(x, y, squareWidth, squareHeight));
@@ -36,11 +34,32 @@ setup = () => {
 
     imgSquares = shuffle(imgSquares);
 
-    missingTileIndex = horizontalSquareCount * verticalSquareCount - 1;
-    
+    missingTileIndex = squareCount * squareCount - 1;
+
     imgSquares[missingTileIndex] = missingTileImage.get(0, 0, squareWidth, squareHeight);
 
     pd = pixelDensity();
+
+}
+
+setup = () => {
+    const canvas = createCanvas(img.width, img.height);
+    canvas.parent('sketch-holder');
+
+    levelSlider = createSlider(3, 10, 5);
+    levelSlider.class(['slider']);
+    levelSlider.parent('level-slider');
+
+    img.loadPixels();
+    missingTileImage.loadPixels();
+
+    const holder = document.getElementById('sketch-holder');
+    const help = document.getElementById('help'); 
+    help.style.left = (holder.offsetLeft  + 10) + "px";
+    help.style.top = (holder.offsetTop + 10 + height) + "px";
+    
+    levelSetup();
+
 
 }
 
@@ -59,17 +78,17 @@ keyPressed = ({ key }) => {
 mouseClicked = ({ offsetX, offsetY }) => {
     if (helpMode === undefined) {
 
-        const tileIndexClicked = Math.floor(offsetX / squareWidth) + Math.floor(offsetY / squareHeight) * horizontalSquareCount;
+        const tileIndexClicked = Math.floor(offsetX / squareWidth) + Math.floor(offsetY / squareHeight) * squareCount;
         if (tileIndexClicked === missingTileIndex - 1) {
             switctTiles(tileIndexClicked, missingTileIndex);
             missingTileIndex = tileIndexClicked;
-        } else if (tileIndexClicked === missingTileIndex - horizontalSquareCount) {
+        } else if (tileIndexClicked === missingTileIndex - squareCount) {
             switctTiles(tileIndexClicked, missingTileIndex);
             missingTileIndex = tileIndexClicked;
         } else if (tileIndexClicked === missingTileIndex + 1) {
             switctTiles(tileIndexClicked, missingTileIndex);
             missingTileIndex = tileIndexClicked;
-        } else if (tileIndexClicked === missingTileIndex + horizontalSquareCount) {
+        } else if (tileIndexClicked === missingTileIndex + squareCount) {
             switctTiles(tileIndexClicked, missingTileIndex);
             missingTileIndex = tileIndexClicked;
         }
@@ -84,6 +103,10 @@ draw = () => {
             helpMode = undefined;
         }
     } else {
+        if (levelSlider.value() !== squareCount) {
+            levelSetup()
+        }
+
         let squareX = 0;
         let squareY = 0;
         for (var square of imgSquares) {
