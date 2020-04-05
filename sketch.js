@@ -1,14 +1,19 @@
+const horizontalSquareCount = 5;
+const verticalSquareCount = 5;
+const helpDurationMillis = 1000;
+
+
 let img;
 
 let imgSquares = [];
 
-const horizontalSquareCount = 5;
-const verticalSquareCount = 5;
 
 let squareWidth;
 let squareHeight;
 
-const importantSquareIndex = 0;
+let missingTileIndex;
+let helpMode;
+
 
 preload = () => {
     img = loadImage('IMG_20190627_223335_SCALED.png');
@@ -29,34 +34,70 @@ setup = () => {
         }
     }
 
-    let missingTileIndex = Math.ceil(random(horizontalSquareCount * verticalSquareCount)) -1;
-    while (missingTileIndex === importantSquareIndex) {
-        missingTileIndex = Math.ceil(random(horizontalSquareCount * verticalSquareCount)) -1;
-    }
+    imgSquares = shuffle(imgSquares);
 
-    imgSquares[missingTileIndex] = missingTileImage.get(0,0, squareWidth, squareHeight);
+    missingTileIndex = horizontalSquareCount * verticalSquareCount - 1;
+    
+    imgSquares[missingTileIndex] = missingTileImage.get(0, 0, squareWidth, squareHeight);
 
     pd = pixelDensity();
-    noLoop();
+
 }
 
-mouseClicked = () => {
-    draw();
+switctTiles = (a, b) => {
+    let tmp = imgSquares[b];
+    imgSquares[b] = imgSquares[a];
+    imgSquares[a] = tmp;
+}
+
+keyPressed = ({ key }) => {
+    if (key && key.toLocaleLowerCase() === 'h') {
+        helpMode = new Date();
+    }
+}
+
+mouseClicked = ({ offsetX, offsetY }) => {
+    if (helpMode === undefined) {
+
+        const tileIndexClicked = Math.floor(offsetX / squareWidth) + Math.floor(offsetY / squareHeight) * horizontalSquareCount;
+        if (tileIndexClicked === missingTileIndex - 1) {
+            switctTiles(tileIndexClicked, missingTileIndex);
+            missingTileIndex = tileIndexClicked;
+        } else if (tileIndexClicked === missingTileIndex - horizontalSquareCount) {
+            switctTiles(tileIndexClicked, missingTileIndex);
+            missingTileIndex = tileIndexClicked;
+        } else if (tileIndexClicked === missingTileIndex + 1) {
+            switctTiles(tileIndexClicked, missingTileIndex);
+            missingTileIndex = tileIndexClicked;
+        } else if (tileIndexClicked === missingTileIndex + horizontalSquareCount) {
+            switctTiles(tileIndexClicked, missingTileIndex);
+            missingTileIndex = tileIndexClicked;
+        }
+    }
+
 }
 
 draw = () => {
-
-    imgSquares = shuffle(imgSquares);
-
-    let squareX = 0;
-    let squareY = 0;
-    for (var square of imgSquares) {
-        image(square, squareX, squareY);
-
-        squareX += squareWidth;
-        if (squareX >= width) {
-            squareX = 0;
-            squareY += squareHeight;
+    if (helpMode) {
+        image(img, 0, 0);
+        if (new Date().getTime() > helpMode.getTime() + helpDurationMillis) {
+            helpMode = undefined;
         }
+    } else {
+        let squareX = 0;
+        let squareY = 0;
+        for (var square of imgSquares) {
+            image(square, squareX, squareY);
+
+            squareX += squareWidth;
+            if (squareX >= width) {
+                squareX = 0;
+                squareY += squareHeight;
+            }
+        }
+
     }
+
+
+    printFrameRate({ fillColor: () => 255 });
 }
