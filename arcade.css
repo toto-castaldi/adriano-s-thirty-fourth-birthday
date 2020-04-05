@@ -1,0 +1,12 @@
+/*****************************
+ All rights reserved.
+ AllFont.ru (c) 2011-2015
+ *****************************/
+@font-face {
+    font-family: 'Arcade';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Arcade'), local('Arcade-Regular'),
+        url(https://allfont.ru/cache/fonts/arcade_0eafe1c6fee47c10571d4c11b521613b.woff) format('woff'),
+        url(https://allfont.ru/cache/fonts/arcade_0eafe1c6fee47c10571d4c11b521613b.ttf) format('truetype');
+}
