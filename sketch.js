@@ -5,7 +5,7 @@ let img;
 let imissingTileImage;
 let fakeHelpImage;
 
-let squareCount;
+let squareCount = 4;
 
 let imgSquares = [];
 
@@ -25,7 +25,7 @@ preload = () => {
 }
 
 levelSetup = () => {
-    squareCount = levelSlider.value();
+    //squareCount = levelSlider.value();
 
     imgSquares = [];
 
@@ -54,9 +54,11 @@ setup = () => {
     const canvas = createCanvas(img.width, img.height);
     canvas.parent('sketch-holder');
 
+    /*
     levelSlider = createSlider(3, 5, 12);
     levelSlider.class(['slider']);
     levelSlider.parent('level-slider');
+    */
 
     img.loadPixels();
     missingTileImage.loadPixels();
@@ -88,7 +90,6 @@ keyPressed = ({ key }) => {
         }
         helpRequestTime = now;
         lastHelpRequest = now;
-        console.log(trueHelp);
     }
 }
 
@@ -120,9 +121,11 @@ draw = () => {
             helpRequestTime = undefined;
         }
     } else {
+        /*
         if (levelSlider.value() !== squareCount) {
             levelSetup()
         }
+        */
 
         let squareX = 0;
         let squareY = 0;
